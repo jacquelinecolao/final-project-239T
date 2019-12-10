@@ -9,7 +9,10 @@ output:
 
 ## 0) Set Up
 
-### 0.1. Setup Environment
+### 0.1. Summary of File 
+This file graphs the percent of total contributions given to party committees by a given interest group in a given year for 8 interest groups of interest. I chose to graph this variable because for my second year paper my independent variable is group-party closeness, which I am measuring by this variable. The idea is that the higher the proportion of total political contributions given to party committees, the closer the group is the party. However, these graphs are messy and hard to make sense of. Therefore, I also graph the total political contributions given by an Interest in a given year, broken down by the amount given to candidates and the amount given to party committees, for 8 interest groups of interest. Graphing the data in this way presents a clearer visual of how much of an interest group's total contributions are going to party committees. 
+
+### 0.2. Setup Environment
 
 ```{r}
 # remove all objects
@@ -36,7 +39,7 @@ pacman::p_load(
 )
 ```
 
-### 0.2. Load dataset
+### 0.3. Load dataset
 
 ```{r}
 party_committee_percent_data<-read.csv("https://raw.github.com/jacquelinecolao/ps239t-final-project/master/Data/Cleaned%20Data%20for%20Graphs/Party%20Committee%20Data%20with%20Total%20Contribution%20Variable.csv")
