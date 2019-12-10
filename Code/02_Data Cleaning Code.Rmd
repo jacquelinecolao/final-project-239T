@@ -13,7 +13,11 @@ output: html_document
 
 ## 0) Set Up
 
-### 0.1. Setup Environment
+### 0.1.Summary of File 
+
+This file cleans the datasets gathered from the followthemoney API to ready them for data visualization. The main two things accomplished are creating a variable that is the percent of total political contributions given by an Interest Group in a year that are given to party committees and creating a dataset that can be used to create a stacked bar graph showing the total political contributions made by an interest group in a year broken down by the amount given to candidates and the amount given to party committees. 
+
+### 0.2. Setup Environment
 
 ```{r}
 # remove all objects
@@ -38,7 +42,7 @@ pacman::p_load(
 
 ```
 
-### 0.2. Load dataset
+### 0.3. Load dataset
 
 ```{r}
 candidate_data <-read.csv("https://raw.github.com/jacquelinecolao/ps239t-final-project/master/Data/Raw%20Data/Interest%20Group%20Candidate%20Donations.csv")
