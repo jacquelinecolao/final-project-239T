@@ -1,0 +1,229 @@
+---
+title: "Data Visualization"
+author: "Jacqueline Colao"
+date: "12/9/2019"
+output: html_document
+---
+
+## 0) Set Up
+
+### 0.1. Setup Environment
+
+```{r}
+# remove all objects
+rm(list=ls())
+
+# check working directory
+getwd()
+
+# Unload all packages 
+library(pacman)
+pacman::p_unload(all)
+
+# Add packages 
+pacman::p_load(
+  tidyverse, #dplyr, readr, etc.
+  data.table, #fread() 
+  foreign, #load data types including stata .dta files 
+  magrittr, #%<>% operator
+  skimr, #for summerising
+  ggthemes, #extra themes
+  viridis, #great colors
+  readr, #to read file from git repository
+  httr
+)
+```
+
+### 0.2. Load dataset
+
+```{r}
+party_committee_percent_data<-read.csv("https://raw.github.com/jacquelinecolao/ps239t-final-project/master/Data/Cleaned%20Data%20for%20Graphs/Party%20Committee%20Data%20with%20Total%20Contribution%20Variable.csv")
+
+stacked_graph_data<-read.csv("https://raw.github.com/jacquelinecolao/ps239t-final-project/master/Data/Cleaned%20Data%20for%20Graphs/Candidate%20and%20Party%20Contribution%20Data%20-%20Stacked%20Graph.csv")
+```
+
+## 1) Data Visualization 
+
+### 1.1. Visualization Set up 
+
+```{r}
+# Change default plot dimensions
+knitr::opts_chunk$set(fig.width=12, fig.height=8)
+
+# Load themes
+source("/Users/jacquelinecolao/Desktop/239T/visualisation.R")
+```
+
+### 1.2. Graph of Percent of Interest Group Contributions to Party Committees
+
+```{r}
+party_committee_percent_data %>%
+  #get the groups of interest
+    filter(Interest.Group %in% c("NATIONAL GAY & LESBIAN TASK FORCE", "EQUALITY PAC","HUMAN RIGHTS CAMPAIGN","GAY & LESBIAN ADVOCATES & DEFENDERS","LPAC","LOG CABIN REPUBLICANS", "GAY & LESBIAN VICTORY FUND", "STONEWALL DEMOCRATS")) %>%
+  #group by Interest Group and Year
+  group_by(Interest.Group,Year) %>%
+  #plot the year against the percent of total contributions given to party committees
+  ggplot(aes(x=Year, y=Percent_Donated_to_Party_Committees)) +
+  #create a line for each Interest Group
+  geom_line(aes(color=Interest.Group)) + 
+  geom_point() +
+  scale_color_brewer(palette="Dark2") +
+  #relable axis and title the graph 
+  xlab("Year") + 
+  ylab("Percent of Total Contributions to Party Committees") + 
+  ggtitle("Interest Group Contributions to Party Committees") +
+  #add theme 
+  theme_ed
+
+
+```
+
+```{r}
+#save the plot
+ggsave("Messy Interest Group Line Graph.png", plot=last_plot(), width= 11, height = 7, path = "/Users/jacquelinecolao/Desktop/ps239t-final-project2/Results")
+```
+
+```{r}
+#same process as above but with a facet wrap to get indivdidual graphs per Interest Group
+party_committee_percent_data %>%
+    filter(Interest.Group %in% c("NATIONAL GAY & LESBIAN TASK FORCE", "EQUALITY PAC","HUMAN RIGHTS CAMPAIGN","GAY & LESBIAN ADVOCATES & DEFENDERS","LPAC","LOG CABIN REPUBLICANS", "GAY & LESBIAN VICTORY FUND", "STONEWALL DEMOCRATS")) %>%
+  group_by(Interest.Group,Year) %>%
+  ggplot(aes(x=Year, y=Percent_Donated_to_Party_Committees)) +
+  geom_line(aes(color=Interest.Group)) + 
+  geom_point() +
+  #Facet Wrap to get individual graphs per Interest Group
+  facet_wrap(~Interest.Group) +
+  scale_color_brewer(palette="Dark2") +
+  xlab("Year") + 
+  ylab("Percent of Total Contributions to Party Committees") + 
+  ggtitle("Interest Group Contributions to Party Committees") +
+  theme_ed 
+```
+
+```{r}
+#save the plot
+ggsave("Facet Wrap Interest Group Line Graph.png", plot=last_plot(), width = 11, path = "/Users/jacquelinecolao/Desktop/ps239t-final-project2/Results")
+```
+
+### 1.3. Bar Graphs of amount to candidates and amount to parties 
+
+```{r}
+stacked_graph_data %>%
+  #filter for the Interest Group of interest
+  filter(Interest.Group %in% c("HUMAN RIGHTS CAMPAIGN")) %>%
+  group_by(Interest.Group,Year) %>%
+  #graph the year against the total amount contributed, filling the bar is based on whether a candidate or party committee recieved the contribution
+  ggplot(aes(fill=recipient, y=amount_contributed, x=Year)) +
+  geom_bar(position="stack", stat="identity") +
+  #label axis and title
+  xlab("Year") + 
+  ylab("Total Contributions") + 
+  ggtitle("Human Rights Campaign Contributions") +
+  #include relevant years
+  scale_x_continuous(limits=c(1996,2020),breaks=seq(1996,2020,2)) +
+  #log the y axis to be able to see the amount of party committee contributions more clearly
+  scale_y_log10() +
+  theme_ed
+
+#save the plot
+ggsave("Human Rights Campaign Contributions.png", plot=last_plot(), path = "/Users/jacquelinecolao/Desktop/ps239t-final-project2/Results")
+
+#do the same process for each Interest Group of interest
+stacked_graph_data %>%
+  filter(Interest.Group %in% c("LPAC")) %>%
+  group_by(Interest.Group,Year) %>%
+  ggplot(aes(fill=recipient, y=amount_contributed, x=Year)) +
+  geom_bar(position="stack", stat="identity") +
+  xlab("Year") + 
+  ylab("Total Contributions") + 
+  ggtitle("LPAC Contributions") +
+  scale_x_continuous(limits=c(1996,2020),breaks=seq(1996,2020,2)) +
+  scale_y_log10() + 
+  theme_ed
+
+ggsave("LPAC Contributions.png", plot=last_plot(), path = "/Users/jacquelinecolao/Desktop/ps239t-final-project2/Results")
+
+stacked_graph_data %>%
+  filter(Interest.Group %in% c("LOG CABIN REPUBLICANS")) %>%
+  group_by(Interest.Group,Year) %>%
+  ggplot(aes(fill=recipient, y=amount_contributed, x=Year)) +
+  geom_bar(position="stack", stat="identity") +
+  xlab("Year") + 
+  ylab("Total Contributions") + 
+  ggtitle("Log Cabin Republicans Contributions") +
+  scale_x_continuous(limits=c(1996,2020),breaks=seq(1996,2020,2)) +
+  scale_y_log10() + 
+  theme_ed
+
+ggsave("Log Cabin Republicans Contributions.png", plot=last_plot(), path = "/Users/jacquelinecolao/Desktop/ps239t-final-project2/Results")
+
+stacked_graph_data %>%
+  filter(Interest.Group %in% c("STONEWALL DEMOCRATS")) %>%
+  group_by(Interest.Group,Year) %>%
+  ggplot(aes(fill=recipient, y=amount_contributed, x=Year)) +
+  geom_bar(position="stack", stat="identity") +
+  xlab("Year") + 
+  ylab("Total Contributions") + 
+  ggtitle("Stonewall Democrats Contributions") +
+  scale_x_continuous(limits=c(1996,2020),breaks=seq(1996,2020,2)) +
+  scale_y_log10() + 
+  theme_ed
+
+ggsave("Stonewall Democrats Contributions.png", plot=last_plot(), path = "/Users/jacquelinecolao/Desktop/ps239t-final-project2/Results")
+
+stacked_graph_data %>%
+  filter(Interest.Group %in% c("EQUALITY PAC")) %>%
+  group_by(Interest.Group,Year) %>%
+  ggplot(aes(fill=recipient, y=amount_contributed, x=Year)) +
+  geom_bar(position="stack", stat="identity") +
+  xlab("Year") + 
+  ylab("Total Contributions") + 
+  ggtitle("Equality PAC Contributions") +
+  scale_x_continuous(limits=c(1996,2020),breaks=seq(1996,2020,2)) +
+  scale_y_log10() + 
+  theme_ed
+
+ggsave("Equality PAC Contributions.png", plot=last_plot(), path = "/Users/jacquelinecolao/Desktop/ps239t-final-project2/Results")
+
+stacked_graph_data %>%
+  filter(Interest.Group %in% c("NATIONAL GAY & LESBIAN TASK FORCE")) %>%
+  group_by(Interest.Group,Year) %>%
+  ggplot(aes(fill=recipient, y=amount_contributed, x=Year)) +
+  geom_bar(position="stack", stat="identity") +
+  xlab("Year") + 
+  ylab("Total Contributions") + 
+  ggtitle("National Gay & Lesbian Task Force Contributions") +
+  scale_x_continuous(limits=c(1996,2020),breaks=seq(1996,2020,2)) +
+  scale_y_log10() + 
+  theme_ed
+
+ggsave("National Gay & Lesbian Task Force Contributions.png", plot=last_plot(), path = "/Users/jacquelinecolao/Desktop/ps239t-final-project2/Results")
+
+stacked_graph_data %>%
+  filter(Interest.Group %in% c("GAY & LESBIAN VICTORY FUND")) %>%
+  group_by(Interest.Group,Year) %>%
+  ggplot(aes(fill=recipient, y=amount_contributed, x=Year)) +
+  geom_bar(position="stack", stat="identity") +
+  xlab("Year") + 
+  ylab("Total Contributions") + 
+  ggtitle("Gay & Lesbian Victory Fund Contributions") +
+  scale_x_continuous(limits=c(1996,2020),breaks=seq(1996,2020,2)) +
+  scale_y_log10() + 
+  theme_ed
+
+ggsave("Gay & Lesbian Victory Fund Contributions.png", plot=last_plot(), path = "/Users/jacquelinecolao/Desktop/ps239t-final-project2/Results")
+
+stacked_graph_data %>%
+  filter(Interest.Group %in% c("GAY & LESBIAN ADVOCATES & DEFENDERS")) %>%
+  group_by(Interest.Group,Year) %>%
+  ggplot(aes(fill=recipient, y=amount_contributed, x=Year)) +
+  geom_bar(position="stack", stat="identity") +
+  xlab("Year") + 
+  ylab("Total Contributions") + 
+  ggtitle("Gay & Lesbian Advocates and Defenders Contributions") +
+  scale_x_continuous(limits=c(1996,2020),breaks=seq(1996,2020,2)) +
+  scale_y_log10() + 
+  theme_ed
+
+ggsave("Gay & Lesbian Advocates and Defenders Contributions.png", plot=last_plot(), path = "/Users/jacquelinecolao/Desktop/ps239t-final-project2/Results")
+```
