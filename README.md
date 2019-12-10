@@ -2,7 +2,7 @@
 
 ## Short Description
 
-This project focuses on the independent variable of a larger project. This variable is interest group-party closeness. One way I am operationalizing this variable is the percent of political contributions given to party committees by an interest group. My main focus is on LGBT interest groups, and those are the groups that I collect data on for this project. 
+This project focuses on the independent variable of a larger project. This variable is interest group-party closeness. I am operationalizing this variable as the percent of political contributions given to party committees by an interest group. My main focus is on LGBT interest groups, and those are the groups that I collect data on for this project. 
 
 I use the followthemoney API to gather political contribution data for 440 LGBT interest groups. First, I gathered the names and followthemoney ID numbers for all of the interest groups labeled as LGBT on the followthemoney website. Then, I gathered the names of party committees the interest group has donated to, the amount of this donation, and the year the donation was made. I also gathered the names of all of the candidates the interest group has donated to, the names of these candidates, the year the donation was made, as well as information about the type of election, whether the candidate won the election, and the party of the candidate. Lastly, I gathered the total amount of campaign contributions (defined as the amount donated to candidates plus the amount donated to party committees) in a given year for each interest group. 
 
