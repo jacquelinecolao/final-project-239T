@@ -38,7 +38,7 @@ Party Committee Data with Total Contribution Variables.csv: Contains data on the
 ### Results
 
 Messy Interest Group Line Graph.png: Graphs the percent of total contributions given to party committees across time for 8 interest groups - all on the same graph.
-Facet Wrap Interest Group Line graph: Graphs the percent of total contributions given to party committees across time for 8 interest groups - each on a different graph.
+Facet Wrap Interest Group Line Graph.png: Graphs the percent of total contributions given to party committees across time for 8 interest groups - each on a different graph.
 Gay & Lesbian Advocates and Defenders Contributions.png: Graphs the total amount of campaign contributions given by Gay & Lesbian Advocates and Defenders across time, broken down by the amount given to candidates and the amount given to party committees.
 Gay & Lesbian Victory Fund Contributions.png: Graphs the total amount of campaign contributions given by Gay & Lesbian Victory Fund across time, broken down by the amount given to candidates and the amount given to party committees.
 Human Rights Campaign Contributions.png: Graphs the total amount of campaign contributions given by the Human Rights Campaign across time, broken down by the amount given to candidates and the amount given to party committees.
