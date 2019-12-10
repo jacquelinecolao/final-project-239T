@@ -13,7 +13,7 @@ output: html_document
 
 ## 0) Set Up
 
-### 0.1.Summary of File 
+### 0.1. Summary of File 
 
 This file cleans the datasets gathered from the followthemoney API to ready them for data visualization. The main two things accomplished are creating a variable that is the percent of total political contributions given by an Interest Group in a year that are given to party committees and creating a dataset that can be used to create a stacked bar graph showing the total political contributions made by an interest group in a year broken down by the amount given to candidates and the amount given to party committees. 
 
