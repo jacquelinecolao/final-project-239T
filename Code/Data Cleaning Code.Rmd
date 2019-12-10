@@ -1,0 +1,171 @@
+---
+title: "Data Cleaning"
+author: "Jacqueline Colao"
+date: "12/9/2019"
+output: html_document
+---
+---
+title: "PS 239T Final Project - Data Cleaning"
+author: "Jacqueline Colao"
+date: "12/1/2019"
+output: html_document
+---
+
+## 0) Set Up
+
+### 0.1. Setup Environment
+
+```{r}
+# remove all objects
+rm(list=ls())
+
+# check working directory
+getwd()
+
+# Unload all packages 
+library(pacman)
+pacman::p_unload(all)
+
+# Add packages 
+pacman::p_load(
+  tidyverse, #dplyr, readr, etc.
+  foreign, #load data types including stata .dta files 
+  magrittr, #%<>% operator
+  skimr, #for summerising
+  readr, #to read file from git repository
+  httr
+)
+
+```
+
+### 0.2. Load dataset
+
+```{r}
+candidate_data <-read.csv("https://raw.github.com/jacquelinecolao/ps239t-final-project/master/Data/Raw%20Data/Interest%20Group%20Candidate%20Donations.csv")
+
+partyCommittee_data<-read.csv("https://raw.github.com/jacquelinecolao/ps239t-final-project/master/Data/Raw%20Data/Interest%20Group%20Party%20Committee%20Donations.csv")
+
+totalContributions_byYear_data<-read.csv("https://raw.github.com/jacquelinecolao/ps239t-final-project/master/Data/Raw%20Data/Interest%20Group%20Total%20Contributions.csv")
+```
+
+## 1) Summarise Data 
+
+### 1.1. Totals for Party Committee Data 
+
+```{r}
+#get total contributions to party committees by each Interest Group for each year
+partyCommittee_data %<>%
+  #group the data by Interest Group and Year
+  group_by(Interest.Group,Year) %>%
+  #sum the contributions for the Interest Group in the Year
+  mutate(total_contributions_IC_Year=sum(Amount.Contributed)) %>%
+  #ungroup so that each party committee donation also has a variable with the total party committee donations
+  ungroup()
+```
+
+### 1.2. Totals for Candidate Data 
+
+```{r}
+#get total contributions to candidate by an Interest Group for each year
+#same process as above 
+candidate_data %<>%
+  group_by(Interest.Group,Year) %>%
+  mutate(total_contributions_IC_Year=sum(Contribution)) %>%
+  ungroup()
+```
+
+## 2) Arrange Data
+
+### 2.1. Arrange Party Committee Data 
+
+```{r}
+#arranges the data alphabetically by Interest Group - showing the most recent year first for each Interest Group
+partyCommittee_data %<>%
+  arrange(Interest.Group,desc(Year)) 
+```
+
+### 2.2. Arrange Candidate Contribution Data 
+
+```{r}
+#arranges the candidate data in the same way as the party committee data
+candidate_data %<>%
+  arrange(Interest.Group,desc(Year))
+```
+
+
+### 2.3. Arrange Total Contributions Data 
+
+```{r}
+#same for total contribution data
+totalContributions_byYear_data %<>% 
+  arrange(Interest.Group,desc(Year))
+```
+
+## 3) Getting Data Ready to Graph - Creating New Variables 
+
+### 3.1. Preparation for Graphing the Percent of Total Contributions Given to Party Committees 
+
+```{r}
+#merge the total contributions data with the party committee data 
+total_contributions_plus_partyCommittee=left_join(totalContributions_byYear_data,partyCommittee_data,by=c("Interest.Group","Year"))
+
+#replace NAs with 0s
+total_contributions_plus_partyCommittee %<>%
+  mutate_all(funs(replace(., is.na(.), 0))) %>%
+  #rename variables 
+  rename("Total_Contributions" = Amount.Contributed.x) %>%
+  rename("Party_Committee_Contribution" = Amount.Contributed.y) %>%
+  rename("Total_Party_Committee_Contribution_by_Year" = total_contributions_IC_Year) %>%
+  #create a new variable that is the percent of total contributions given to party committees
+  mutate("Percent_Donated_to_Party_Committees" = Total_Party_Committee_Contribution_by_Year/Total_Contributions)
+
+write.csv(total_contributions_plus_partyCommittee,"/Users/jacquelinecolao/Desktop/ps239t-final-project2/Data/Cleaned Data for Graphs/Party Committee Data with Total Contribution Variable.csv")
+```
+
+### 3.2. Preparation for Graphing a Stacked Bar Graph of party committee donations and candidate donations 
+
+```{r}
+#need to get the data in a form to be able to make a stacked bar graph
+total_contributions_plus_partyCommittee %<>%
+  #create a variable that is the amount the Interest Group contributed to candidates
+  mutate(amount_to_candidate = Total_Contributions-Total_Party_Committee_Contribution_by_Year) %>%
+  #create a categorical variable of whether the amount contributed is to a candidate or party committee - here it is to party committees 
+  mutate(recipient = "Party Committee")
+  
+
+#copy the above data frame 
+data_2<-total_contributions_plus_partyCommittee
+#create a categorical variable that indicates that the amount contributed is to a candidate 
+data_2 %<>%
+  mutate(recipient = "Candidate") %>%
+  #delete the party committee contribution variable 
+  select(-c(Total_Party_Committee_Contribution_by_Year)) %>%
+  #rename candidate contribution variable to amount_contributed 
+  rename(amount_contributed = amount_to_candidate) %>%
+  #remane total contribution variable 
+  rename(total_contributions = Total_Contributions)
+
+total_contributions_plus_partyCommittee %<>%
+  #delete to candidate contribution variable 
+  select(-c(amount_to_candidate)) %>%
+  #rename party contribution variable to amount_contributed 
+  rename(amount_contributed = Total_Party_Committee_Contribution_by_Year) %>%
+  #remane total contribution variable 
+  rename(total_contributions = Total_Contributions)
+
+#combine the two datasets 
+data <- bind_rows(total_contributions_plus_partyCommittee,data_2)
+
+#arrange
+data %<>% arrange(Interest.Group,desc(Year))
+
+#get rid of the party committees and donations to specific committees
+data %<>%
+  select(-c(Party.Committee,Party_Committee_Contribution,Percent_Donated_to_Party_Committees)) %>%
+  #delete duplicate rows
+  distinct(Interest.Group, Year,recipient, .keep_all = TRUE)
+
+
+write.csv(data,"/Users/jacquelinecolao/Desktop/ps239t-final-project2/Data/Cleaned Data for Graphs/Candidate and Party Contribution Data - Stacked Graph.csv" )
+
+```
