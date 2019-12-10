@@ -227,7 +227,6 @@ while i < len(interest_group):
     group.extend(interest_group[i])
     i = i + 215
 
-#Georgia stonewall Democrats
 #Like I said above, the code only made it through about half of the groups 
 #This code deletes the Interest Group names from the list who the code has not grabbed data for yet 
 group=group[:6046]
@@ -296,8 +295,8 @@ file_list = [
     '/Users/jacquelinecolao/Desktop/ps239t-final-project2/Data/Raw Data/Interest_Group_ID_List.csv',
     '/Users/jacquelinecolao/Desktop/ps239t-final-project2/Data/Raw Data/Interest Group Total Contributions.csv',
     '/Users/jacquelinecolao/Desktop/ps239t-final-project2/Data/Raw Data/Interest Group Candidate Donations.csv',
-    '/Users/jacquelinecolao/Desktop/ps239t-final-project2/Data/Raw Data/Interest Group Party Committee Donations.csv'
-    
+    '/Users/jacquelinecolao/Desktop/ps239t-final-project2/Data/Raw Data/Interest Group Party Committee Donations.csv',
+    '/Users/jacquelinecolao/Desktop/ps239t-final-project2/Code/01_gather_data.py'
 ]
 commit_message = 'upload raw datafiles'
 repo.index.add(file_list)
