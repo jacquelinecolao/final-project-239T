@@ -15,8 +15,6 @@ Once I compiled these datasets, I was able to calculate the percent of campaign 
 
 ## Files
 
-List all other files contained in the repo, along with a brief description of each one, like so:
-
 ### Data
 
 #### Raw Data 
